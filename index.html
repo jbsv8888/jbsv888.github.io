@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background-color: #e0e0e0; /* Soft gray background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      text-align: center;
+      position: relative;
+    }
+
+    /* Envelope Styling */
+    .envelope {
+      width: 350px;
+      height: 200px;
+      background-color: #2e3a59; /* Deep navy color for the envelope */
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      transition: transform 0.5s ease;
+    }
+
+    /* Envelope Flap - White Triangle */
+    .flap {
+      width: 0;
+      height: 0;
+      border-left: 175px solid transparent;
+      border-right: 175px solid transparent;
+      border-bottom: 100px solid white;
+      position: absolute;
+      top: -100px;
+      left: 0;
+      z-index: 2;
+      transform-origin: bottom;
+      transform: rotateX(180deg);
+      transition: transform 0.5s ease;
+    }
+
+    /* Envelope Body */
+    .body {
+      width: 100%;
+      height: 100%;
+      background-color: #2e3a59; /* Deep navy for body */
+      border-radius: 12px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    /* Love Letter Box */
+    .letter-box {
+      display: none;
+      background-color: #fff8e1; /* Soft cream background */
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      width: 80%;
+      max-height: 500px; /* Set maximum height for scrolling */
+      margin-top: 20px;
+      overflow-y: auto; /* Enable vertical scrolling */
+      opacity: 0;
+      transform: translateY(5px); /* Start below the screen */
+      transition: opacity 5s ease-in-out, transform 1s ease-in-out; /* Animate both fade and slide up */
+    }
+
+    .letter-header {
+      font-size: 2.5em;
+      color: #e91e63; /* Soft pink color for the header */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .letter-content {
+      font-size: 1.2em;
+      line-height: 1.6;
+      color: #555; /* Dark gray for the text */
+    }
+
+    /* Opened Envelope Animation */
+    .envelope.open .flap {
+      transform: rotateX(0deg);
+    }
+
+    .envelope.open .body {
+      background-color: transparent;
+    }
+
+    .envelope.open .letter-box {
+      display: block;
+      opacity: 1;
+      transform: translateY(0); /* Slide up effect when it opens */
+    }
+
+    /* Heart confetti */
+    .heart {
+      position: absolute;
+      font-size: 4em; /* Bigger hearts */
+      color: #e91e63; /* Soft pink hearts */
+      opacity: 0.5; /* Less visible */
+      animation: heartPop 5s ease-in-out forwards; /* Slower animation */
+    }
+
+    @keyframes heartPop {
+      0% {
+        transform: scale(0) translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(var(--scale)) translate(var(--x-move), var(--y-move));
+        opacity: 0;
+      }
+    }
+
+    /* Container for confetti hearts */
+    .confetti-container {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Envelope -->
+    <div class="envelope" id="envelope">
+      <div class="flap"></div>
+      <div class="body"></div>
+    </div>
+
+    <!-- Love Letter content -->
+    <div class="letter-box" id="letterBox">
+      <h1 class="letter-header"></h1>
+      <p id="letterContent" class="letter-content"></p>
+    </div>
+
+    <!-- Heart confetti container -->
+    <div class="confetti-container" id="confettiContainer"></div>
+  </div>
+
+  <script>
+    // Envelope click to open
+    document.getElementById('envelope').addEventListener('click', function() {
+      // Trigger envelope opening animation
+      this.classList.add('open');
+      
+      // Show the love letter content after a short delay to match the animation
+      setTimeout(function() {
+        document.getElementById('letterBox').style.display = 'block';
+        document.getElementById('letterBox').style.opacity = 1;
+
+        // Trigger heart confetti animation
+        triggerHeartConfetti();
+      }, 800);  // Delay to ensure envelope animation finishes
+    });
+
+    // Heart confetti trigger
+    function triggerHeartConfetti() {
+      const confettiContainer = document.getElementById('confettiContainer');
+      
+      for (let i = 0; i < 300; i++) {  // Increase number of hearts for more coverage
+        setTimeout(function() {
+          const heart = document.createElement('div');
+          heart.classList.add('heart');
+          heart.innerHTML = '❤️';
+
+          // Randomize direction, position, and size
+          const randomX = Math.random() * 2000 - 1000; // Horizontal movement (-1000px to 1000px)
+          const randomY = Math.random() * -2000 - 200; // Vertical movement (-200px to -2000px)
+          const randomScale = Math.random() * 0.8 + 0.6; // Random size between 0.6x and 1.4x scale
+
+          // Set the random movement and scale using CSS variables
+          heart.style.setProperty('--x-move', `${randomX}px`);
+          heart.style.setProperty('--y-move', `${randomY}px`);
+          heart.style.setProperty('--scale', randomScale);
+
+          // Position the heart at the bottom of the screen
+          heart.style.left = `${Math.random() * 100}%`;
+          heart.style.top = '100%'; // Position near the bottom
+
+          // Random animation delay and duration for variety
+          const delay = Math.random() * 0.5;
+          const duration = Math.random() * 5 + 5; // Duration between 5s and 10s
+          
+          heart.style.animationDelay = `${delay}s`;
+          heart.style.animationDuration = `${duration}s`;
+
+          // Add heart to confetti container
+          confettiContainer.appendChild(heart);
+
+          // Remove heart after animation
+          setTimeout(() => {
+            heart.remove();
+          }, duration * 1000); // Remove heart after animation ends
+        }, i * 5); // Stagger heart appearances faster
+      }
+    }
+
+    // Letter content to reveal
+    const letterContent = `
+      Alam ko, may mga araw na parang ang bigat ng lahat, o kaya naman parang wala kang makakausap. Yung tipong kahit anong gawin mo, parang hindi mo kayang i-handle lahat ng nangyayari. Minsan, feeling mo parang andami mong iniisip o pinagdadaanan, tapos parang walang way para mapagaan. Ang hirap magpanggap na okay ka lang, lalo na kung minsan hindi mo na alam kung saan magsisimula. Lahat ng mga bagay na pinapasan mo parang sobrang bigat, at gusto mo lang mag-isa. Pero gusto ko lang sanang iparating na okay lang ‘yun. Lahat ng nararamdaman mo ay valid, at walang masama kung hindi mo agad kayang maging okay. Hindi mo kailangang madaliin ang sarili mo. Minsan, ang kailangan lang ay magpahinga, at darating din yung mga araw na magiging mas magaan. Tandaan mo na hindi ka nag-iisa sa lahat ng ito, at may mga araw na magiging mas magaan din ang lahat.
+    `;
+
+    // Insert the letter content
+    document.getElementById('letterContent').innerHTML = letterContent;
+  </script>
+</body>
+</html>
